@@ -19,6 +19,8 @@ import {
     CLEAR_MESSAGE,
     ERROR_ADDING_FAVORITE_LOCATION,
     ERROR_REMOVING_FAVORITE_LOCATION,
+    SET_SEARCH_HISTORY,
+    ADD_TO_SEARCH_HISTORY,
 } from '../actions/types'
 
 export const initialState = {
@@ -40,6 +42,7 @@ export const initialState = {
     selectedFavoriteLocationFilter: 0,
     submittingMessage: false, 
     confirmationMessage: '',
+    searchHistory: [],
 }
 
 export default (state = initialState, action) => {
@@ -176,6 +179,23 @@ export default (state = initialState, action) => {
             ...state,
             confirmationMessage: '',
         }
+    case SET_SEARCH_HISTORY:
+        return {
+            ...state,
+            searchHistory: action.searchHistory,
+        }
+    case ADD_TO_SEARCH_HISTORY: {
+        const searchHistory = !state.searchHistory.includes(action.value) ? 
+            [action.value].concat(state.searchHistory).slice(0, 10) : state.searchHistory
+
+        AsyncStorage.setItem('history', JSON.stringify(searchHistory))
+        
+
+        return {
+            ...state,
+            searchHistory,
+        }
+    }
     default:
         return state
     }

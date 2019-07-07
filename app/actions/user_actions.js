@@ -18,6 +18,8 @@ import {
     CLEAR_MESSAGE,
     ERROR_ADDING_FAVORITE_LOCATION,
     ERROR_REMOVING_FAVORITE_LOCATION,
+    SET_SEARCH_HISTORY,
+    ADD_TO_SEARCH_HISTORY,
 } from './types'
 
 import { getCurrentLocation, getData, postData } from '../config/request'
@@ -172,4 +174,18 @@ export const clearMessage = () => ({ type: CLEAR_MESSAGE })
 export const messageSubmissionFailed = (err) => {
     console.log(err)
     return { type: MESSAGE_SUBMISSION_FAILED }
+}
+
+export const setSearchHistory = (searchHistory) => {
+    return {
+        type: SET_SEARCH_HISTORY,
+        searchHistory,
+    }
+}
+
+export const addToSearchHistory = (value) => {
+    return {
+        type: ADD_TO_SEARCH_HISTORY,
+        value,
+    }
 }

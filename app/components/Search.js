@@ -21,6 +21,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { getData } from '../config/request'
 import { 
+    addToSearchHistory,
     displayError,
     getLocationsByCity,
     getLocationsByRegion,
@@ -75,6 +76,7 @@ class Search extends Component {
     }
 
     geocodeSearch = (query) => {
+        this.props.addToSearchHistory(query)
         this.setState({ searching: true })
         Geocode.fromAddress(query)
             .then(response => {
@@ -92,16 +94,19 @@ class Search extends Component {
     }
 
     getLocationsByCity = (location) => {
+        this.props.addToSearchHistory(this.state.q)
         this.props.getLocationsByCity(location.value)
         this.clearSearchState()
     }
     
     goToLocation = (location) => {
+        this.props.addToSearchHistory(this.state.q)
         this.props.navigate('LocationDetails', {id: location.id, locationName: location.label, updateMap: true})
         this.clearSearchState()
     }
 
     getLocationsByRegion = (region) => {
+        this.props.addToSearchHistory(this.state.q)
         this.props.getLocationsByRegion(region)
         this.clearSearchState()
     }
@@ -109,6 +114,24 @@ class Search extends Component {
     clearSearchState = () => {
         this.changeQuery('')
         this.setState({searchModalVisible: false})
+    }
+
+    getRecentSearches = () => {
+        if (!this.state.q && this.props.user.searchHistory) {
+            return this.props.user.searchHistory.map(value => (
+                <TouchableOpacity 
+                    key={value}
+                    onPress={() => this.changeQuery(value)}
+                >
+                    <ListItem
+                        key={value}
+                        title={value}
+                        titleStyle={{color:'#4b5862',marginBottom:-2,marginTop:-2}}
+                        containerStyle={{borderBottomColor:'#97a5af',borderBottomWidth:1,backgroundColor:'#f5fbff'}}
+                    />
+                </TouchableOpacity>
+            ))
+        }
     }
 
     render(){
@@ -195,7 +218,8 @@ class Search extends Component {
                                         /> 
                                     </TouchableOpacity>)
                                 ) : null
-                            }                        
+                            }    
+                            {this.getRecentSearches()}                
                         </ScrollView>
                     </View>
                 </Modal>
@@ -264,10 +288,13 @@ Search.propTypes = {
     updateCoordinates: PropTypes.func,
     getLocationsByCity: PropTypes.func,
     getLocationsByRegion: PropTypes.func,
+    user: PropTypes.object,
+    addToSearchHistory: PropTypes.func,
 }
 
-const mapStateToProps = ({ regions, query, user }) => ({ regions, query, user})
+const mapStateToProps = ({ regions, query, user }) => ({ regions, query, user })
 const mapDispatchToProps = (dispatch) => ({
+    addToSearchHistory: (value) => dispatch(addToSearchHistory(value)),
     displayError: error => dispatch(displayError(error)),
     getLocationsByCity: (city) => dispatch(getLocationsByCity(city)),
     updateCoordinates: (lat, lng) => dispatch(updateCurrCoordinates(lat, lng)),

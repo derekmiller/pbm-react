@@ -21,6 +21,7 @@ import {
     getFavoriteLocations,
     clearFilters,
     clearError,
+    setSearchHistory,
     updateMapCoordinates,
 } from '../actions'
 import { 
@@ -30,6 +31,7 @@ import {
 import {
     getMapLocations
 } from '../selectors'
+import { retrieveItem } from '../config/utils'
 
 class CustomMarker extends Component
 {
@@ -156,6 +158,8 @@ class Map extends Component {
         await Font.loadAsync({'MaterialIcons': require('@expo/vector-icons/fonts/MaterialIcons.ttf')})
         await Font.loadAsync({'Material Icons': require('@expo/vector-icons/fonts/MaterialIcons.ttf')})
         this.setState({ materialIconsLoaded: true })
+
+        retrieveItem('history').then((history = []) => this.props.setSearchHistory(history))
     }
 
     UNSAFE_componentWillReceiveProps(props) {
@@ -320,6 +324,7 @@ Map.propTypes = {
     clearFilters: PropTypes.func,
     clearError: PropTypes.func,
     error: PropTypes.object,
+    setSearchHistory: PropTypes.func,
 }
 
 const mapStateToProps = (state) => {
@@ -341,6 +346,7 @@ const mapDispatchToProps = (dispatch) => ({
     clearFilters: () => dispatch(clearFilters()),
     clearError: () => dispatch(clearError()),
     updateMapCoordinates: (lat, lon, latDelta, lonDelta) => dispatch(updateMapCoordinates(lat, lon, latDelta, lonDelta)),
+    setSearchHistory: (history) => dispatch(setSearchHistory(history)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map)
